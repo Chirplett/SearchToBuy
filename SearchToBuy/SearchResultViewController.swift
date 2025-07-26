@@ -8,11 +8,16 @@
 import UIKit
 
 class SearchResultViewController: UIViewController {
+    
+    var typedText: String = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        view.backgroundColor = .white
+        navigationItem.title = typedText
+        
+        
     }
     
 
