@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CB09AA902E386F5600D92C0C /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = CB09AA8F2E386F5600D92C0C /* .gitignore */; };
+		CBD9A85D2E36A08E009C6817 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = CBD9A85C2E36A08E009C6817 /* Alamofire */; };
+		CBD9A8FE2E37E876009C6817 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = CBD9A8FD2E37E876009C6817 /* Kingfisher */; };
 		CBEA3CE02E354AE3009E1BDD /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = CBEA3CDF2E354AE3009E1BDD /* SnapKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CB09AA8F2E386F5600D92C0C /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		CBEA3C742E35494B009E1BDD /* SearchToBuy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SearchToBuy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -40,7 +44,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBD9A8FE2E37E876009C6817 /* Kingfisher in Frameworks */,
 				CBEA3CE02E354AE3009E1BDD /* SnapKit in Frameworks */,
+				CBD9A85D2E36A08E009C6817 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +56,7 @@
 		CBEA3C6B2E35494B009E1BDD = {
 			isa = PBXGroup;
 			children = (
+				CB09AA8F2E386F5600D92C0C /* .gitignore */,
 				CBEA3C762E35494B009E1BDD /* SearchToBuy */,
 				CBEA3C752E35494B009E1BDD /* Products */,
 			);
@@ -84,6 +91,8 @@
 			name = SearchToBuy;
 			packageProductDependencies = (
 				CBEA3CDF2E354AE3009E1BDD /* SnapKit */,
+				CBD9A85C2E36A08E009C6817 /* Alamofire */,
+				CBD9A8FD2E37E876009C6817 /* Kingfisher */,
 			);
 			productName = SearchToBuy;
 			productReference = CBEA3C742E35494B009E1BDD /* SearchToBuy.app */;
@@ -115,6 +124,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				CBEA3CDE2E354AE3009E1BDD /* XCRemoteSwiftPackageReference "SnapKit" */,
+				CBD9A85B2E36A08E009C6817 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				CBD9A8FC2E37E876009C6817 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CBEA3C752E35494B009E1BDD /* Products */;
@@ -131,6 +142,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB09AA902E386F5600D92C0C /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +372,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		CBD9A85B2E36A08E009C6817 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+		CBD9A8FC2E37E876009C6817 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 		CBEA3CDE2E354AE3009E1BDD /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -371,6 +399,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		CBD9A85C2E36A08E009C6817 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CBD9A85B2E36A08E009C6817 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		CBD9A8FD2E37E876009C6817 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CBD9A8FC2E37E876009C6817 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		CBEA3CDF2E354AE3009E1BDD /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CBEA3CDE2E354AE3009E1BDD /* XCRemoteSwiftPackageReference "SnapKit" */;
