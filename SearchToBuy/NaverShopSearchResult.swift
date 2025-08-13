@@ -18,4 +18,6 @@ struct SearchResultInner: Decodable {
     let image: String
     let lprice: String
     let mallName: String
+    
+    // Codingkeys 찾아보기
 }

@@ -12,6 +12,7 @@ import Alamofire
 class SearchResultViewController: UIViewController {
     
     var typedText: String = ""
+    var currentSort: String = "sim"
     
     private let numberOfResultLabel: UILabel = {
         let numberOfResultLabel = UILabel()
@@ -74,7 +75,7 @@ class SearchResultViewController: UIViewController {
         return sortingButtonsStackView
     }()
     
-    lazy var collectionView: UICollectionView = {
+    lazy var mainResultCollectionView: UICollectionView = { //lazy var를 써야 되는 이유?
         
         let layout = UICollectionViewFlowLayout()
         let deviceWidth = UIScreen.main.bounds.width
@@ -90,6 +91,7 @@ class SearchResultViewController: UIViewController {
         
         collectionView.backgroundColor = .clear
         collectionView.register(EachResultCollectionViewCell.self, forCellWithReuseIdentifier: EachResultCollectionViewCell.identifier)
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         
@@ -97,11 +99,36 @@ class SearchResultViewController: UIViewController {
         
     }()
     
-    var list: SearchResultOuter?
-    var innerList: [SearchResultInner] = []
-    var start = 1
-    var isEnd = false
-    var totalCount = 0
+    lazy var promotionCollectionView: UICollectionView = {
+        view.backgroundColor = .clear
+        
+        let layout = UICollectionViewFlowLayout()
+        
+        //        let width = UIScreen.main.bounds.width
+        //        let spacing = 8.0
+        //        let itemCount = 2.6
+        //
+        //        let dimension = (width - (spacing * 2)) / itemCount //1개의 너비
+        layout.itemSize = CGSize(width: 80, height: 80)
+        layout.minimumInteritemSpacing = 8
+        layout.scrollDirection = .horizontal
+        
+        let promotionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
+        promotionCollectionView.register(PromotionCollectionViewCell.self, forCellWithReuseIdentifier: PromotionCollectionViewCell.identifier)
+        
+        promotionCollectionView.delegate = self
+        promotionCollectionView.dataSource = self
+        
+        return promotionCollectionView
+    }()
+    
+    private var list: SearchResultOuter?
+    private var innerList: [SearchResultInner] = []
+    private var promotionList : [SearchResultInner] = []
+    private var start = 1
+    private var isEnd = false
+    private var totalCount = 0
     
     
     override func viewDidLoad() {
@@ -111,13 +138,13 @@ class SearchResultViewController: UIViewController {
         configureView()
         configureLayout()
         
-        callRequest()
+        callRequest(sort: currentSort)
         
     }
     
     
-    func callRequest() {
-        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(typedText)&start=\(start)&display=30"
+    func callRequest(sort: String) {
+        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(typedText)&start=\(start)&display=30&sort=\(sort)"
         let header: HTTPHeaders = [
             "X-Naver-Client-Id": APIKey.naverKeyID,
             "X-Naver-Client-Secret": APIKey.naverKeySecret
@@ -132,11 +159,13 @@ class SearchResultViewController: UIViewController {
                     
                     self.innerList.append(contentsOf: value.items)
                     self.numberOfResultLabel.text = "\(value.total)개의 검색 결과"
-                    self.collectionView.reloadData()
+                    self.mainResultCollectionView.reloadData()
                     self.totalCount = value.total
                     
                 case .failure(let error):
+                    self.showAlert(title: "오류", message: "네트워크 통신에 실패하였습니다. \n잠시 후 다시 시도해주세요.")
                     print("fail", error)
+                    
                 }
                 
                 
@@ -144,8 +173,62 @@ class SearchResultViewController: UIViewController {
         
     }
     
+    @objc private func sortingButtonsClicked(_ sender: UIButton) {
+        
+        if sender == sortBySimilarityButton {
+            currentSort = "sim"
+        } else if sender == sortByDateDscButton {
+            currentSort = "date"
+        } else if sender == sortByPriceDscButton {
+            currentSort = "dsc"
+        } else if sender == sortByPriceAscButton {
+            currentSort = "asc"
+        }
+        
+        updateSortingButtonsUI(selected: sender)
+        resetSearch()
+        callRequest(sort: currentSort)
+    }
     
+    private func updateSortingButtonsUI(selected: UIButton) {
+        let allButtons = [
+            sortBySimilarityButton,
+            sortByDateDscButton,
+            sortByPriceDscButton,
+            sortByPriceAscButton
+        ]
+        
+        for button in allButtons {
+            if button == selected {
+                button.backgroundColor = .white
+                button.setTitleColor(.black, for: .normal)
+                button.layer.borderColor = UIColor.white.cgColor
+            } else {
+                button.backgroundColor = .clear
+                button.setTitleColor(.systemGray2, for: .normal)
+                button.layer.borderColor = UIColor.systemGray2.cgColor
+            }
+        }
+    }
+    
+    private func resetSearch() {
+        start = 1
+        isEnd = false
+        innerList.removeAll()
+        mainResultCollectionView.reloadData()
+        
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "확인", style: .default)
+        alert.addAction(ok)
+        present(alert, animated: true)
+        
+    }
 }
+
+
 
 extension SearchResultViewController: ViewDesignProtocol {
     
@@ -158,14 +241,29 @@ extension SearchResultViewController: ViewDesignProtocol {
         sortingButtonsStackView.addArrangedSubview(sortByPriceAscButton)
         
         view.addSubview(sortingButtonsStackView)
-        view.addSubview(collectionView)
+        view.addSubview(mainResultCollectionView)
         
+        view.addSubview(promotionCollectionView)
         
     }
     
     func configureView() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
+        
         navigationItem.title = typedText
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBackground
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        
+        sortBySimilarityButton.addTarget(self, action: #selector(sortingButtonsClicked(_:)), for: .touchUpInside)
+        sortByDateDscButton.addTarget(self, action: #selector(sortingButtonsClicked(_:)), for: .touchUpInside)
+        sortByPriceDscButton.addTarget(self, action: #selector(sortingButtonsClicked(_:)), for: .touchUpInside)
+        sortByPriceAscButton.addTarget(self, action: #selector(sortingButtonsClicked(_:)), for: .touchUpInside)
     }
     
     func configureLayout() {
@@ -178,10 +276,16 @@ extension SearchResultViewController: ViewDesignProtocol {
             make.leading.equalTo(numberOfResultLabel.snp.leading)
             make.trailing.lessThanOrEqualToSuperview().offset(-20)
         }
-        collectionView.snp.makeConstraints { make in
+        mainResultCollectionView.snp.makeConstraints { make in
             make.top.equalTo(sortingButtonsStackView.snp.bottom).offset(8)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+            //            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+        }
+        promotionCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(mainResultCollectionView.snp.bottom).offset(8)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(80)
         }
     }
     
@@ -196,37 +300,50 @@ extension SearchResultViewController: UICollectionViewDelegate, UICollectionView
         if indexPath.item == innerList.count - 4, isEnd == false {
             start += 30
             
-            callRequest()
+            callRequest(sort: currentSort)
             
         }
         
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(innerList.count)
-        return innerList.count
-        
+        if collectionView == mainResultCollectionView {
+            return innerList.count
+        } else {
+            return 10
+        }
+            
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EachResultCollectionViewCell.identifier, for: indexPath) as! EachResultCollectionViewCell
-        
-        let eachResult = innerList[indexPath.item]
-        
-        cell.configureData(eachResult: eachResult)
-        
-        return cell
+        if collectionView == mainResultCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EachResultCollectionViewCell.identifier, for: indexPath) as? EachResultCollectionViewCell else {
+                
+                return UICollectionViewCell()
+            }
+            
+            let eachResult = innerList[indexPath.item]
+            
+            cell.configureData(eachResult: eachResult)
+            
+            return cell
+            
+            
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PromotionCollectionViewCell.identifier, for: indexPath) as? PromotionCollectionViewCell else {
+                
+                return UICollectionViewCell()
+            }
+            return cell
+        }
     }
     
+
 }
 
-
-extension String {
+extension String { //왜 익스텐션에서는 저장 프로퍼티를 못 쓸까?
     var removingHTMLTags: String {
         return self.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
     }
 }
-
-    
-    

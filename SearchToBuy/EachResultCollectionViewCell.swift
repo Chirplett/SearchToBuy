@@ -25,6 +25,13 @@ class EachResultCollectionViewCell: UICollectionViewCell {
         configureHierarchy()
         configureLayout()
         configureView()
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.likeButton.layer.cornerRadius = self.likeButton.bounds.width / 2
+            self.likeButton.clipsToBounds = true
+        }
+        
     }
     
     required init?(coder: NSCoder) {
@@ -63,13 +70,14 @@ class EachResultCollectionViewCell: UICollectionViewCell {
             make.bottom.equalTo(thumbnailImageView.snp.bottom).inset(16)
             make.leading.greaterThanOrEqualTo(thumbnailImageView.snp.leading).offset(16)
             make.top.greaterThanOrEqualTo(thumbnailImageView.snp.top).offset(16)
+            make.size.equalTo(28)
         }
         
     }
     
     func configureView() {
         thumbnailImageView.contentMode = .scaleAspectFill
-//        thumbnailImageView.backgroundColor = .yellow
+        //        thumbnailImageView.backgroundColor = .yellow
         thumbnailImageView.layer.cornerRadius = 10
         thumbnailImageView.clipsToBounds = true
         
@@ -84,10 +92,18 @@ class EachResultCollectionViewCell: UICollectionViewCell {
         lowestPriceLabel.textColor = .systemGray
         
         likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
-        likeButton.backgroundColor = .white
-        likeButton.layer.backgroundColor = UIColor.white.cgColor
         
+        likeButton.tintColor = .black
+        
+        likeButton.backgroundColor = .white
     }
+    
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        likeButton.layer.cornerRadius = likeButton.bounds.width / 2
+//        likeButton.clipsToBounds = true
+//    }
+
     
     func configureData(eachResult: SearchResultInner) {
         
@@ -99,7 +115,7 @@ class EachResultCollectionViewCell: UICollectionViewCell {
         titleLabel.text = eachResult.title.removingHTMLTags
         
         lowestPriceLabel.text = eachResult.lprice
-
+        
         
     }
     

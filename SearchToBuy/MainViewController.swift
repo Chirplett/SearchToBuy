@@ -10,6 +10,8 @@ import SnapKit
 
 class MainViewController: UIViewController {
     
+    private let viewModel = MainViewModel()
+    
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.searchTextField.attributedPlaceholder = NSAttributedString(string: "브랜드, 상품, 프로필, 태그 등", attributes: [.foregroundColor: UIColor.lightGray])
@@ -30,7 +32,27 @@ class MainViewController: UIViewController {
         configureHierarchy()
         configureView()
         configureLayout()
+        
+        configureBind()
     }
+    
+    func configureBind() {
+        viewModel.output.textSuccess.lazyBind { text in
+            let viewController = SearchResultViewController()
+            self.navigationController?.pushViewController(viewController, animated: true)
+            viewController.typedText = text
+        }
+        viewModel.output.textFail.lazyBind { text in
+            self.showAlert(title: "error", message: text) {
+            } cancelHandler: {
+            }
+            
+            
+        }
+        
+    }
+    
+    
 }
 
 extension MainViewController: ViewDesignProtocol {
@@ -65,14 +87,17 @@ extension MainViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
-        guard let typedText = searchBar.text, typedText.count >= 2 else {
-            return
-        }
+        //        guard let typedText = searchBar.text, typedText.count >= 2 else {
+        //            //얼럿 띄워보기
+        //            return
+        //        }
         
-        let viewController = SearchResultViewController()
-        navigationController?.pushViewController(viewController, animated: true)
+//        let viewController = SearchResultViewController()
+//        navigationController?.pushViewController(viewController, animated: true)
+//        
+        //        viewController.typedText = typedText
         
-        viewController.typedText = typedText
+        viewModel.input.text.value = searchBar.text
         
     }
     
